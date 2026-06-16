@@ -8,11 +8,11 @@ GameCube automation alternative firmware for RP2040.
 
 ## Pin assignment
 
-| Pico  | XIAO RP2040 |      Function      |
-| :---: | :---------: | :----------------: |
-|   7   |     D5      |   GameCube DATA    |
-|   0   |     D6      |       Servo        |
-|   3   |     D10     | Reset (Active Low) |
+| Pico  | XIAO RP2040 |  RP2040-One  |      Function      |
+| :---: | :---------: | :----------: | :----------------: |
+|   7   |     D5      |     GP0      |   GameCube DATA    |
+|   0   |     D6      | GP18 (unused) |       Servo        |
+|   3   |     D10     | GP19 (unused) | Reset (Active Low) |
 
 ## Button mapping
 

@@ -6,24 +6,11 @@
 #include <Bluewhale.h>
 #include <jiangtun.h>
 
-static const pin_size_t PIN_GAMECUBE = 7; // D5 (SCL)
-static const pin_size_t PIN_SERVO = 0;    // D6 (TX)
-static const pin_size_t PIN_RESET = 3;    // D10 (MOSI)
+static const pin_size_t PIN_GAMECUBE = 0; // GP0 (RP2040-One)
+static const pin_size_t PIN_SERVO = 18;   // unused (parked on a free GPIO)
+static const pin_size_t PIN_RESET = 19;   // unused (parked on a free GPIO)
 
-static const pin_size_t PIN_XIAO_NEOPIXEL = 12;
-static const pin_size_t PIN_XIAO_NEOPIXEL_POWER = 11;
-static const pin_size_t PIN_XIAO_LED_R = 17;
-static const pin_size_t PIN_XIAO_LED_G = 16;
-/**
- * GPIO25 is connected to the anode of the built-in LED on the Pico (lit
- * when HIGH), and to the cathode of the blue channel of the RGB LED on the
- * XIAO RP2040 (lit when LOW).
- * This firmware prioritizes blinking the LED on the Pico, so on the XIAO
- * RP2040, the blue LED will remain on and turn off when input is accepted.
- * As a replacement on the XIAO RP2040, the NeoPixel, which is brighter than
- * the RGB LED, will light up.
- */
-static const pin_size_t PIN_XIAO_LED_B_PICO_LED_BUILTIN = 25;
+static const pin_size_t PIN_NEOPIXEL = 16; // WS2812 RGB LED (RP2040-One)
 
 static CGamecubeConsole gamecube(PIN_GAMECUBE);
 static Servo servo;
@@ -34,7 +21,7 @@ static bool current_reset_state = true; // to ensure initial releasing
 static bool write_at_least_once = false;
 static mutex_t write_at_least_once_mtx;
 
-static Adafruit_NeoPixel pixels(1, PIN_XIAO_NEOPIXEL, NEO_GRB + NEO_KHZ800);
+static Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 static jiangtun_board_t board;
 static jiangtun_t j;
 
@@ -116,7 +103,6 @@ static jiangtun_bool_t gamecube_send(jiangtun_board_t *board,
 static void led_set(jiangtun_board_t *board, jiangtun_bool_t state) {
     assert(board != NULL);
 
-    digitalWrite(PIN_XIAO_LED_B_PICO_LED_BUILTIN, state ? HIGH : LOW);
     if (state) {
         uint16_t hue = (millis() % 2000) * (65535 / 2000);
         pixels.setPixelColor(0, Adafruit_NeoPixel::ColorHSV(hue));
@@ -135,16 +121,6 @@ static jiangtun_uint32_t get_millis(jiangtun_board_t *board) {
 void setup() {
     Serial.begin(115200);
 
-    pinMode(PIN_XIAO_LED_R, OUTPUT);
-    pinMode(PIN_XIAO_LED_G, OUTPUT);
-    digitalWrite(PIN_XIAO_LED_R, HIGH);
-    digitalWrite(PIN_XIAO_LED_G, HIGH);
-
-    pinMode(PIN_XIAO_LED_B_PICO_LED_BUILTIN, OUTPUT);
-    digitalWrite(PIN_XIAO_LED_B_PICO_LED_BUILTIN, LOW);
-
-    pinMode(PIN_XIAO_NEOPIXEL_POWER, OUTPUT);
-    digitalWrite(PIN_XIAO_NEOPIXEL_POWER, HIGH);
     pixels.begin();
     pixels.clear();
     pixels.show();
